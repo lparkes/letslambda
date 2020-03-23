@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+
+  build:
+    commands:
+       - git clone https://github.com/rayba/letslambda.git
+       - cd letslambda && python3 -m pip install --target=./ -r requirements.txt
+       - zip -r letslambda.zip .
+       - aws s3 cp letslambda.zip s3://$S3_BUCKET/letslambda.zip
+       - aws cloudformation create-stack --stack-name LetsLambda --template-body  file://letslambda.json --parameters ParameterKey=Region,ParameterValue=$AWS_DEFAULT_REGION ParameterKey=Bucket,ParameterValue=$S3_BUCKET --capabilities CAPABILITY_IAM --region=$AWS_DEFAULT_REGION || echo "stack already exists"
