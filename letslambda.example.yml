@@ -3,4 +3,3 @@ domain: example.com
 domain_alt_names:
   - int.example.com
   - dev.example.com
-
