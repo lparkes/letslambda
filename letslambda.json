@@ -176,7 +176,7 @@
                 "Handler" : "letslambda.lambda_handler",
                 "MemorySize" : 128,
                 "Role" : {"Fn::GetAtt" : ["LambdaExecutionRole", "Arn"]},
-                "Runtime" : "python2.7",
+                "Runtime" : "python3.7",
                 "Timeout" : "240",
                 "Code": {
                     "S3Bucket": {"Ref": "Bucket"},
