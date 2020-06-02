@@ -145,7 +145,7 @@ def request_certificate(conf):
                         domain_alt_names=conf['domain_alt_names'], 
                         contact_email=conf['contact_email'],
                         dns_class=dns_class,
-                        account_key=load_from_s3("account.key.rsa"))
+                        account_key=load_from_s3(conf, "account.key.rsa"))
     if is_new(conf):
         print('requesting new certificate')
         certificate = client.cert()
