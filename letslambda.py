@@ -135,11 +135,7 @@ def lambda_handler(event, context):
     request_certificate(conf)
 
 def is_new(conf):
-    try:
-        load_from_s3(conf, 'account.key.rsa')
-        return True
-    except:
-        return False
+    return load_from_s3(conf, conf["domain"]+".certificate.cert") == None
 
 def request_certificate(conf):
     dns_class = sewer.Route53Dns()
@@ -148,7 +144,8 @@ def request_certificate(conf):
     client = sewer.Client(domain_name=conf['domain'], 
                         domain_alt_names=conf['domain_alt_names'], 
                         contact_email=conf['contact_email'],
-                        dns_class=dns_class)
+                        dns_class=dns_class,
+                        account_key=load_from_s3("account.key.rsa"))
     if is_new(conf):
         print('requesting new certificate')
         certificate = client.cert()
@@ -162,8 +159,8 @@ def request_certificate(conf):
     # openssl x509 -in some_certificate_and_chain.crt -text -noout
     account_key = client.account_key
     print("your certificate is:", certificate)
-    print("your certificate's key is:", certificate_key)
-    print("your letsencrypt.org account key is:", account_key)
+    #print("your certificate's key is:", certificate_key)
+    #print("your letsencrypt.org account key is:", account_key)
     save_certificates_to_s3(conf, certificate, certificate_key, account_key)
     # NB: your certificate_key and account_key should be SECRET.
     # keep them very safe.
