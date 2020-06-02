@@ -35,7 +35,7 @@ def load_from_s3(conf, s3_key):
         LOG.error("Error: {0}".format(e))
         return None
 
-    return content
+    return content.decode("utf-8")
 
 def load_config(s3, s3_bucket, letslambda_config):
     """
@@ -141,11 +141,13 @@ def request_certificate(conf):
     dns_class = sewer.Route53Dns()
     # https://github.com/komuw/sewer/blob/43c3c8efae36489939d93096579ec54e941f67c7/sewer/client.py
     # 1. to create a new certificate:
+    # Increase ACME_AUTH_STATUS_MAX_CHECKS for a timeout of about 60s.
     client = sewer.Client(domain_name=conf['domain'], 
-                        domain_alt_names=conf['domain_alt_names'], 
-                        contact_email=conf['contact_email'],
-                        dns_class=dns_class,
-                        account_key=load_from_s3(conf, "account.key.rsa"))
+                          domain_alt_names=conf['domain_alt_names'],
+                          contact_email=conf['contact_email'],
+                          dns_class=dns_class,
+                          account_key=load_from_s3(conf, "account.key.rsa"),
+                          ACME_AUTH_STATUS_MAX_CHECKS=8)
     if is_new(conf):
         print('requesting new certificate')
         certificate = client.cert()
